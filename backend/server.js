@@ -12,6 +12,7 @@ import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
 import fileUpload from "express-fileupload";
 
 dotenv.config({ path: path.resolve(__dirname, "./.env") });
+
 import cors from "cors";
 import { createSocket } from "./utils/socketio.js";
 
@@ -23,7 +24,6 @@ const app = express();
 app.use(cors());
 
 app.use(express.json({ limit: "50mb" }));
-
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(
   fileUpload({

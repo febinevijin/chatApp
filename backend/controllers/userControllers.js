@@ -3,11 +3,15 @@ import User from "../models/userModel.js";
 import generateToken from "../utils/jwtToken.js";
 // import cloudinary from "../utils/cloudinary.js";
 import cloudinary from "cloudinary";
+import path from "path"
+import fs from 'fs'
+
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
+
 
 export const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password, pic } = req.body;
@@ -85,3 +89,51 @@ export const allUsers = asyncHandler(async (req, res) => {
   const users = await User.find(keyword).find({ _id: { $ne: req.user._id } });
   res.send(users);
 });
+
+
+export const upImage = asyncHandler(async (req, res) => {
+  try {
+    const file = req.files.image;
+    const tempFilePath = `uploads/${file.name}`;
+    const writeStream = fs.createWriteStream(tempFilePath);
+    writeStream.write(file.data);
+    writeStream.end();
+
+    writeStream.on("finish", () => {
+      console.log(`File saved to ${tempFilePath}`);
+      res.send("File uploaded");
+    });
+
+     const profile = await cloudinary.v2.uploader.upload(tempFilePath, {
+       folder: "profileImages",
+     });
+      console.log(profile.secure_url);
+      console.log(profile.public_id);
+
+    // setTimeout(() => {
+    //   // delete the temporary file after sending the response
+    //   fs.unlink(tempFilePath, (err) => {
+    //     if (err) {
+    //       console.error(`Error deleting ${tempFilePath}: ${err}`);
+    //     } else {
+    //       console.log(`Deleted ${tempFilePath}`);
+    //     }
+    //   });
+    // }, 5000);
+  } catch (error) {
+    console.log(error.message);
+  }
+
+  
+  // try {
+  //  const profile = await cloudinary.v2.uploader.upload(req.file.path, {
+  //    folder: "profileImages",
+  //  });
+  //   console.log(profile.secure_url);
+  //   console.log(profile.public_id);
+
+  // } catch (error) {
+  //   console.log(error,'gdfgdg');
+  // throw new Error(error);
+  // }
+})

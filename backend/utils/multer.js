@@ -1,9 +1,9 @@
-import multer from 'multer';
-import path from 'path'
+import multer from "multer";
+import path from "path";
 
 // Multer config
 export default multer({
-  storage: multer.diskStorage({}),
+  storage: multer.diskStorage({ dest: "uploads/" }),
   fileFilter: (req, file, cb) => {
     let ext = path.extname(file.originalname);
     if (ext !== ".jpg" && ext !== ".jpeg" && ext !== ".png") {
